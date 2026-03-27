@@ -8,7 +8,7 @@ import MatchPage from "./pages/MatchPage";
 import PaymentPage from "./pages/PaymentPage";
 import TeamPage from "./pages/TeamPage";
 import LeaderboardPage from "./pages/LeaderboardPage";
-import AdminPage from "./pages/AdminPage";
+import DNTPage from "./pages/DNTPage";
 import NotFound from "./pages/NotFound";
 
 const queryClient = new QueryClient();
@@ -25,7 +25,7 @@ const App = () => (
           <Route path="/payment" element={<PaymentPage />} />
           <Route path="/team" element={<TeamPage />} />
           <Route path="/leaderboard" element={<LeaderboardPage />} />
-          <Route path="/admin" element={<AdminPage />} />
+          <Route path="/dnt" element={<DNTPage />} />
           <Route path="*" element={<NotFound />} />
         </Routes>
       </BrowserRouter>
