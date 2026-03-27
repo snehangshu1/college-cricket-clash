@@ -9,20 +9,20 @@ const LeaderboardPage = () => {
   const currentUser = getCurrentUser();
   const [, setTick] = useState(0);
 
-  if (!currentUser) {
-    navigate("/");
-    return null;
-  }
-
-  // Auto-refresh every 5 seconds for "live" updates
   useEffect(() => {
+    if (!currentUser) {
+      navigate("/");
+      return;
+    }
     recalcAllPoints();
     const interval = setInterval(() => {
       recalcAllPoints();
       setTick((t) => t + 1);
     }, 5000);
     return () => clearInterval(interval);
-  }, []);
+  }, [currentUser, navigate]);
+
+  if (!currentUser) return null;
 
   const users = getUsers();
   const sorted = Object.values(users)
@@ -74,28 +74,23 @@ const LeaderboardPage = () => {
                       : "border-border bg-card"
                   }`}
                 >
-                  {/* Rank */}
                   <div className="flex h-10 w-10 flex-shrink-0 items-center justify-center rounded-full bg-secondary text-sm font-bold">
                     {getRankIcon(index) || `#${index + 1}`}
                   </div>
-
-                  {/* User Info */}
                   <div className="min-w-0 flex-1">
                     <div className="flex items-center gap-2">
-                      <span className="font-semibold truncate">{user.name}</span>
+                      <span className="truncate font-semibold">{user.name}</span>
                       {isMe && (
                         <span className="rounded bg-primary/20 px-1.5 py-0.5 text-[10px] font-bold text-primary">
                           YOU
                         </span>
                       )}
                     </div>
-                    <div className="text-xs text-muted-foreground truncate">
+                    <div className="truncate text-xs text-muted-foreground">
                       {playerNames.length} players
                       {captainName && ` • C: ${captainName}`}
                     </div>
                   </div>
-
-                  {/* Points */}
                   <div className="text-right">
                     <div className="text-xl font-black text-primary">
                       {(user.points || 0).toFixed(1)}

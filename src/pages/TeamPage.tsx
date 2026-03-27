@@ -20,12 +20,19 @@ const TeamPage = () => {
   const [captain, setCaptain] = useState<string>(user?.captain || "");
   const [filter, setFilter] = useState<string>("ALL");
 
+  const filteredPlayers = useMemo(
+    () =>
+      filter === "ALL"
+        ? PLAYERS
+        : PLAYERS.filter((p) => p.role === filter),
+    [filter]
+  );
+
   if (!user) {
     navigate("/");
     return null;
   }
 
-  // Not paid — show blocked state
   if (!user.paid) {
     return (
       <div className="min-h-screen bg-background">
@@ -34,8 +41,7 @@ const TeamPage = () => {
           <ShieldAlert className="h-16 w-16 text-warning" />
           <h2 className="text-xl font-bold">Waiting for Approval</h2>
           <p className="text-sm text-muted-foreground">
-            Your payment must be approved by the admin before you can select
-            your team. Please check back later.
+            Your payment must be approved by the admin before you can select your team.
           </p>
           <button
             onClick={() => navigate("/match")}
@@ -47,14 +53,6 @@ const TeamPage = () => {
       </div>
     );
   }
-
-  const filteredPlayers = useMemo(
-    () =>
-      filter === "ALL"
-        ? PLAYERS
-        : PLAYERS.filter((p) => p.role === filter),
-    [filter]
-  );
 
   const togglePlayer = (id: string) => {
     if (selected.includes(id)) {
@@ -92,7 +90,6 @@ const TeamPage = () => {
     <div className="min-h-screen bg-background">
       <AppHeader />
       <div className="mx-auto max-w-5xl px-4 py-6">
-        {/* Header */}
         <div className="mb-6 flex items-center justify-between">
           <div>
             <h2 className="text-xl font-bold">Select Your Team</h2>
@@ -106,7 +103,6 @@ const TeamPage = () => {
           </div>
         </div>
 
-        {/* Filters */}
         <div className="mb-4 flex gap-2 overflow-x-auto pb-2">
           {["ALL", "BAT", "BOWL", "AR", "WK"].map((role) => (
             <button
@@ -123,7 +119,6 @@ const TeamPage = () => {
           ))}
         </div>
 
-        {/* Player Cards */}
         <div className="grid gap-3 sm:grid-cols-2">
           {filteredPlayers.map((player) => {
             const isSelected = selected.includes(player.id);
@@ -139,7 +134,6 @@ const TeamPage = () => {
                 }`}
               >
                 <div className="flex items-center gap-3">
-                  {/* Avatar */}
                   <div
                     className={`flex h-10 w-10 items-center justify-center rounded-full text-xs font-bold ${
                       player.team === "MI"
@@ -150,7 +144,7 @@ const TeamPage = () => {
                     {player.team}
                   </div>
                   <div>
-                    <div className="font-semibold text-sm">{player.name}</div>
+                    <div className="text-sm font-semibold">{player.name}</div>
                     <div className="text-xs text-muted-foreground">
                       {ROLE_LABELS[player.role]} • {player.credits} cr
                     </div>
@@ -158,7 +152,6 @@ const TeamPage = () => {
                 </div>
 
                 <div className="flex items-center gap-2">
-                  {/* Captain toggle */}
                   {isSelected && (
                     <button
                       onClick={() => toggleCaptain(player.id)}
@@ -172,8 +165,6 @@ const TeamPage = () => {
                       <Star className="h-3.5 w-3.5" />
                     </button>
                   )}
-
-                  {/* Select toggle */}
                   <button
                     onClick={() => togglePlayer(player.id)}
                     className={`flex h-8 w-8 items-center justify-center rounded-full border transition-all ${
@@ -190,7 +181,6 @@ const TeamPage = () => {
           })}
         </div>
 
-        {/* Save Button */}
         <div className="sticky bottom-0 mt-6 bg-background pb-4 pt-2">
           <button
             onClick={handleSave}
