@@ -21,13 +21,13 @@ const AppHeader = () => {
   if (!user) return null;
 
   return (
-    <header className="sticky top-0 z-50 border-b border-border bg-card/80 backdrop-blur-xl">
+    <header className="sticky top-0 z-50 border-b border-border bg-card/95 backdrop-blur-md">
       <div className="mx-auto flex max-w-5xl items-center justify-between px-4 py-3">
-        <Link to="/match" className="flex items-center gap-2">
-          <div className="gradient-primary flex h-8 w-8 items-center justify-center rounded-lg">
+        <Link to="/match" className="flex items-center gap-2.5">
+          <div className="gradient-primary flex h-8 w-8 items-center justify-center rounded-lg shadow-glow">
             <Trophy className="h-4 w-4 text-primary-foreground" />
           </div>
-          <span className="text-lg font-bold text-gradient">CricBattle</span>
+          <span className="font-display text-lg font-bold text-gradient">CricBattle</span>
         </Link>
 
         <nav className="hidden items-center gap-1 sm:flex">
@@ -37,8 +37,8 @@ const AppHeader = () => {
               to={item.path}
               className={`rounded-lg px-3 py-1.5 text-sm font-medium transition-colors ${
                 location.pathname === item.path
-                  ? "bg-primary/10 text-primary"
-                  : "text-muted-foreground hover:text-foreground"
+                  ? "bg-primary/10 text-primary font-semibold"
+                  : "text-muted-foreground hover:text-foreground hover:bg-muted"
               }`}
             >
               {item.label}
@@ -49,15 +49,15 @@ const AppHeader = () => {
         <div className="flex items-center gap-3">
           <Link
             to="/dnt"
-            className="text-muted-foreground transition-colors hover:text-foreground"
+            className="rounded-lg p-1.5 text-muted-foreground transition-colors hover:text-foreground hover:bg-muted"
             title="Admin Panel"
           >
             <Shield className="h-4 w-4" />
           </Link>
-          <span className="text-sm text-muted-foreground">{user.name}</span>
+          <span className="text-sm font-medium text-foreground">{user.name}</span>
           <button
             onClick={handleLogout}
-            className="text-muted-foreground transition-colors hover:text-destructive"
+            className="rounded-lg p-1.5 text-muted-foreground transition-colors hover:text-destructive hover:bg-destructive/10"
             title="Logout"
           >
             <LogOut className="h-4 w-4" />
@@ -71,9 +71,9 @@ const AppHeader = () => {
           <Link
             key={item.path}
             to={item.path}
-            className={`flex-1 py-2 text-center text-xs font-medium transition-colors ${
+            className={`flex-1 py-2.5 text-center text-xs font-medium transition-colors ${
               location.pathname === item.path
-                ? "border-b-2 border-primary text-primary"
+                ? "border-b-2 border-primary text-primary font-semibold"
                 : "text-muted-foreground"
             }`}
           >

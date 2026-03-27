@@ -1,7 +1,5 @@
 // ==========================================
 // LOCAL STORAGE BASED STORE
-// This simulates a database using localStorage.
-// Replace with Lovable Cloud (Supabase) for real persistence.
 // ==========================================
 
 export interface User {
@@ -17,7 +15,7 @@ export interface User {
 export interface Player {
   id: string;
   name: string;
-  team: string; // IPL team abbreviation
+  team: string;
   role: "BAT" | "BOWL" | "AR" | "WK";
   credits: number;
   image?: string;
@@ -30,6 +28,10 @@ export interface PlayerScore {
   sixes: number;
   wickets: number;
   catches: number;
+  outs: number;
+  hatricks: number;
+  noballs: number;
+  catchouts: number;
 }
 
 // ---- Hardcoded Players for MI vs CSK ----
@@ -106,7 +108,7 @@ export function submitPayment(transactionId: string) {
   const users = getUsers();
   if (users[email]) {
     users[email].transactionId = transactionId;
-    users[email].paid = false; // awaiting admin approval
+    users[email].paid = false;
     saveUsers(users);
   }
 }
@@ -148,7 +150,11 @@ export function calculatePlayerPoints(score: PlayerScore): number {
   const sixPoints = score.sixes * 4;
   const wicketPoints = score.wickets * 4;
   const catchPoints = score.catches * 3;
-  return runPoints + fourPoints + sixPoints + wicketPoints + catchPoints;
+  const outPoints = (score.outs || 0) * 4;
+  const hatrickPoints = (score.hatricks || 0) * 8;
+  const noballPoints = (score.noballs || 0) * 3;
+  const catchoutPoints = (score.catchouts || 0) * 3;
+  return runPoints + fourPoints + sixPoints + wicketPoints + catchPoints + outPoints + hatrickPoints + noballPoints + catchoutPoints;
 }
 
 export function calculateUserPoints(user: User): number {
@@ -159,7 +165,7 @@ export function calculateUserPoints(user: User): number {
     const score = scores[playerId];
     if (score) {
       let pts = calculatePlayerPoints(score);
-      if (playerId === user.captain) pts *= 2; // Captain gets double
+      if (playerId === user.captain) pts *= 2;
       total += pts;
     }
   }

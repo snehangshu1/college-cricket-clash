@@ -12,7 +12,7 @@ import AppHeader from "@/components/AppHeader";
 import { ShieldCheck, Users, BarChart3, Check, X } from "lucide-react";
 import { toast } from "sonner";
 
-const AdminPage = () => {
+const DNTPage = () => {
   const [tab, setTab] = useState<"users" | "scores">("users");
   const [, setTick] = useState(0);
 
@@ -27,7 +27,6 @@ const AdminPage = () => {
     refresh();
   };
 
-  // ---- Score Input State ----
   const [scoreInputs, setScoreInputs] = useState<Record<string, PlayerScore>>({});
 
   useEffect(() => {
@@ -41,6 +40,10 @@ const AdminPage = () => {
         sixes: 0,
         wickets: 0,
         catches: 0,
+        outs: 0,
+        hatricks: 0,
+        noballs: 0,
+        catchouts: 0,
       };
     });
     setScoreInputs(init);
@@ -70,37 +73,35 @@ const AdminPage = () => {
   return (
     <div className="min-h-screen bg-background">
       <AppHeader />
-      <div className="mx-auto max-w-5xl px-4 py-6">
+      <div className="mx-auto max-w-6xl px-4 py-6">
         <div className="mb-6 flex items-center gap-3">
           <ShieldCheck className="h-6 w-6 text-primary" />
-          <h2 className="text-xl font-bold">Admin Panel</h2>
+          <h2 className="text-xl font-bold font-display">DNT Panel</h2>
         </div>
 
-        {/* Tabs */}
         <div className="mb-6 flex gap-2">
           <button
             onClick={() => setTab("users")}
-            className={`flex items-center gap-2 rounded-lg px-4 py-2 text-sm font-semibold transition-colors ${
+            className={`flex items-center gap-2 rounded-lg px-4 py-2 text-sm font-semibold transition-all ${
               tab === "users"
-                ? "bg-primary text-primary-foreground"
-                : "bg-secondary text-secondary-foreground hover:bg-secondary/80"
+                ? "bg-primary text-primary-foreground shadow-glow"
+                : "bg-muted text-muted-foreground hover:bg-muted/80"
             }`}
           >
             <Users className="h-4 w-4" /> Users & Payments
           </button>
           <button
             onClick={() => setTab("scores")}
-            className={`flex items-center gap-2 rounded-lg px-4 py-2 text-sm font-semibold transition-colors ${
+            className={`flex items-center gap-2 rounded-lg px-4 py-2 text-sm font-semibold transition-all ${
               tab === "scores"
-                ? "bg-primary text-primary-foreground"
-                : "bg-secondary text-secondary-foreground hover:bg-secondary/80"
+                ? "bg-primary text-primary-foreground shadow-glow"
+                : "bg-muted text-muted-foreground hover:bg-muted/80"
             }`}
           >
             <BarChart3 className="h-4 w-4" /> Score Panel
           </button>
         </div>
 
-        {/* Users Tab */}
         {tab === "users" && (
           <div className="space-y-3">
             {Object.values(users).length === 0 ? (
@@ -109,7 +110,7 @@ const AdminPage = () => {
               Object.values(users).map((user) => (
                 <div
                   key={user.email}
-                  className="flex items-center justify-between rounded-xl border border-border bg-card p-4"
+                  className="flex items-center justify-between rounded-xl border border-border bg-card p-4 shadow-card"
                 >
                   <div>
                     <div className="font-semibold">{user.name}</div>
@@ -117,6 +118,11 @@ const AdminPage = () => {
                     {user.transactionId && (
                       <div className="mt-1 text-xs text-muted-foreground">
                         TXN: <span className="font-mono text-foreground">{user.transactionId}</span>
+                      </div>
+                    )}
+                    {user.team && user.team.length > 0 && (
+                      <div className="mt-1 text-xs text-muted-foreground">
+                        Team: {user.team.length} players selected
                       </div>
                     )}
                   </div>
@@ -128,7 +134,7 @@ const AdminPage = () => {
                     ) : user.transactionId ? (
                       <button
                         onClick={() => handleApprove(user.email)}
-                        className="gradient-primary rounded-lg px-4 py-2 text-xs font-bold text-primary-foreground transition-transform hover:scale-[1.02]"
+                        className="gradient-primary rounded-lg px-4 py-2 text-xs font-bold text-primary-foreground shadow-glow transition-all hover:shadow-lg hover:scale-[1.02]"
                       >
                         Approve
                       </button>
@@ -144,19 +150,22 @@ const AdminPage = () => {
           </div>
         )}
 
-        {/* Scores Tab */}
         {tab === "scores" && (
           <div>
-            <div className="mb-4 overflow-x-auto rounded-xl border border-border">
+            <div className="mb-4 overflow-x-auto rounded-xl border border-border shadow-card">
               <table className="w-full text-sm">
                 <thead>
-                  <tr className="border-b border-border bg-secondary/50">
+                  <tr className="border-b border-border bg-muted/50">
                     <th className="px-4 py-3 text-left font-semibold">Player</th>
-                    <th className="px-3 py-3 text-center font-semibold">Runs</th>
-                    <th className="px-3 py-3 text-center font-semibold">4s</th>
-                    <th className="px-3 py-3 text-center font-semibold">6s</th>
-                    <th className="px-3 py-3 text-center font-semibold">Wkts</th>
-                    <th className="px-3 py-3 text-center font-semibold">Catches</th>
+                    <th className="px-2 py-3 text-center font-semibold">Runs</th>
+                    <th className="px-2 py-3 text-center font-semibold">4s</th>
+                    <th className="px-2 py-3 text-center font-semibold">6s</th>
+                    <th className="px-2 py-3 text-center font-semibold">Wkts</th>
+                    <th className="px-2 py-3 text-center font-semibold">Catches</th>
+                    <th className="px-2 py-3 text-center font-semibold">Outs</th>
+                    <th className="px-2 py-3 text-center font-semibold">Hat-trick</th>
+                    <th className="px-2 py-3 text-center font-semibold">No Ball</th>
+                    <th className="px-2 py-3 text-center font-semibold">Catch Out</th>
                   </tr>
                 </thead>
                 <tbody>
@@ -169,7 +178,7 @@ const AdminPage = () => {
                           <div className="font-medium">{player.name}</div>
                           <div className="text-xs text-muted-foreground">{player.team}</div>
                         </td>
-                        {(["runs", "fours", "sixes", "wickets", "catches"] as const).map(
+                        {(["runs", "fours", "sixes", "wickets", "catches", "outs", "hatricks", "noballs", "catchouts"] as const).map(
                           (field) => (
                             <td key={field} className="px-1 py-2 text-center">
                               <input
@@ -179,7 +188,7 @@ const AdminPage = () => {
                                 onChange={(e) =>
                                   updateField(player.id, field, e.target.value)
                                 }
-                                className="w-16 rounded-lg border border-input bg-secondary px-2 py-1.5 text-center text-sm text-foreground focus:outline-none focus:ring-1 focus:ring-ring"
+                                className="w-14 rounded-lg border border-input bg-background px-2 py-1.5 text-center text-sm text-foreground focus:outline-none focus:ring-1 focus:ring-ring"
                               />
                             </td>
                           )
@@ -193,7 +202,7 @@ const AdminPage = () => {
 
             <button
               onClick={handleSaveScores}
-              className="gradient-primary w-full rounded-xl py-3 text-sm font-bold text-primary-foreground shadow-glow transition-transform hover:scale-[1.01] active:scale-[0.99]"
+              className="gradient-primary w-full rounded-xl py-3 text-sm font-bold text-primary-foreground shadow-glow transition-all hover:shadow-lg hover:scale-[1.01] active:scale-[0.99]"
             >
               Save All Scores & Recalculate Points
             </button>
@@ -204,4 +213,4 @@ const AdminPage = () => {
   );
 };
 
-export default AdminPage;
+export default DNTPage;

@@ -2,7 +2,7 @@ import { useState, useMemo } from "react";
 import { useNavigate } from "react-router-dom";
 import { getCurrentUser, PLAYERS, saveTeam } from "@/lib/store";
 import AppHeader from "@/components/AppHeader";
-import { Check, Star, ShieldAlert } from "lucide-react";
+import { Check, Star, Users } from "lucide-react";
 import { toast } from "sonner";
 
 const ROLE_LABELS: Record<string, string> = {
@@ -11,6 +11,9 @@ const ROLE_LABELS: Record<string, string> = {
   AR: "All-Rounder",
   WK: "Wicketkeeper",
 };
+
+const MAX_PLAYERS = 11;
+const MIN_PLAYERS = 5;
 
 const TeamPage = () => {
   const navigate = useNavigate();
@@ -33,34 +36,13 @@ const TeamPage = () => {
     return null;
   }
 
-  if (!user.paid) {
-    return (
-      <div className="min-h-screen bg-background">
-        <AppHeader />
-        <div className="mx-auto flex max-w-md flex-col items-center gap-4 px-4 py-20 text-center">
-          <ShieldAlert className="h-16 w-16 text-warning" />
-          <h2 className="text-xl font-bold">Waiting for Approval</h2>
-          <p className="text-sm text-muted-foreground">
-            Your payment must be approved by the admin before you can select your team.
-          </p>
-          <button
-            onClick={() => navigate("/match")}
-            className="mt-4 rounded-xl border border-border bg-secondary px-6 py-2.5 text-sm font-medium transition-colors hover:bg-secondary/80"
-          >
-            Back to Match
-          </button>
-        </div>
-      </div>
-    );
-  }
-
   const togglePlayer = (id: string) => {
     if (selected.includes(id)) {
       setSelected(selected.filter((s) => s !== id));
       if (captain === id) setCaptain("");
     } else {
-      if (selected.length >= 7) {
-        toast.error("Maximum 7 players allowed");
+      if (selected.length >= MAX_PLAYERS) {
+        toast.error(`Maximum ${MAX_PLAYERS} players allowed`);
         return;
       }
       setSelected([...selected, id]);
@@ -73,8 +55,8 @@ const TeamPage = () => {
   };
 
   const handleSave = () => {
-    if (selected.length < 5) {
-      toast.error("Select at least 5 players");
+    if (selected.length < MIN_PLAYERS) {
+      toast.error(`Select at least ${MIN_PLAYERS} players`);
       return;
     }
     if (!captain) {
@@ -82,8 +64,13 @@ const TeamPage = () => {
       return;
     }
     saveTeam(selected, captain);
-    toast.success("Team saved successfully!");
-    navigate("/leaderboard");
+    toast.success("Team saved!");
+    // After saving team, go to payment if not paid
+    if (!user.paid && !user.transactionId) {
+      navigate("/payment");
+    } else {
+      navigate("/leaderboard");
+    }
   };
 
   return (
@@ -92,13 +79,16 @@ const TeamPage = () => {
       <div className="mx-auto max-w-5xl px-4 py-6">
         <div className="mb-6 flex items-center justify-between">
           <div>
-            <h2 className="text-xl font-bold">Select Your Team</h2>
+            <h2 className="text-xl font-bold font-display">Select Your Team</h2>
             <p className="text-sm text-muted-foreground">
-              Pick 5–7 players and choose 1 captain (2× points)
+              Pick {MIN_PLAYERS}–{MAX_PLAYERS} players and choose 1 captain (2× points)
             </p>
           </div>
           <div className="text-right">
-            <div className="text-2xl font-black text-primary">{selected.length}/7</div>
+            <div className="flex items-center gap-1.5">
+              <Users className="h-4 w-4 text-primary" />
+              <span className="text-2xl font-black text-primary font-display">{selected.length}/{MAX_PLAYERS}</span>
+            </div>
             <div className="text-xs text-muted-foreground">Selected</div>
           </div>
         </div>
@@ -108,10 +98,10 @@ const TeamPage = () => {
             <button
               key={role}
               onClick={() => setFilter(role)}
-              className={`whitespace-nowrap rounded-lg px-3 py-1.5 text-xs font-semibold transition-colors ${
+              className={`whitespace-nowrap rounded-lg px-4 py-2 text-xs font-semibold transition-all ${
                 filter === role
-                  ? "bg-primary text-primary-foreground"
-                  : "bg-secondary text-secondary-foreground hover:bg-secondary/80"
+                  ? "bg-primary text-primary-foreground shadow-glow"
+                  : "bg-muted text-muted-foreground hover:bg-muted/80 hover:text-foreground"
               }`}
             >
               {role === "ALL" ? "All" : ROLE_LABELS[role]}
@@ -129,16 +119,16 @@ const TeamPage = () => {
                 key={player.id}
                 className={`flex items-center justify-between rounded-xl border p-4 transition-all ${
                   isSelected
-                    ? "border-primary/40 bg-primary/5"
-                    : "border-border bg-card hover:border-border/60"
+                    ? "border-primary/40 bg-primary/5 shadow-card"
+                    : "border-border bg-card hover:border-primary/20 hover:shadow-card"
                 }`}
               >
                 <div className="flex items-center gap-3">
                   <div
-                    className={`flex h-10 w-10 items-center justify-center rounded-full text-xs font-bold ${
+                    className={`flex h-10 w-10 items-center justify-center rounded-xl text-xs font-bold ${
                       player.team === "MI"
-                        ? "bg-info/20 text-info"
-                        : "bg-warning/20 text-warning"
+                        ? "bg-info/10 text-info"
+                        : "bg-warning/10 text-warning"
                     }`}
                   >
                     {player.team}
@@ -155,9 +145,9 @@ const TeamPage = () => {
                   {isSelected && (
                     <button
                       onClick={() => toggleCaptain(player.id)}
-                      className={`flex h-8 w-8 items-center justify-center rounded-full border text-xs font-bold transition-all ${
+                      className={`flex h-8 w-8 items-center justify-center rounded-lg border text-xs font-bold transition-all ${
                         isCaptain
-                          ? "border-primary bg-primary text-primary-foreground"
+                          ? "border-primary bg-primary text-primary-foreground shadow-glow"
                           : "border-border text-muted-foreground hover:border-primary/40"
                       }`}
                       title="Make Captain"
@@ -167,7 +157,7 @@ const TeamPage = () => {
                   )}
                   <button
                     onClick={() => togglePlayer(player.id)}
-                    className={`flex h-8 w-8 items-center justify-center rounded-full border transition-all ${
+                    className={`flex h-8 w-8 items-center justify-center rounded-lg border transition-all ${
                       isSelected
                         ? "border-primary bg-primary text-primary-foreground"
                         : "border-border text-muted-foreground hover:border-primary/40"
@@ -181,13 +171,13 @@ const TeamPage = () => {
           })}
         </div>
 
-        <div className="sticky bottom-0 mt-6 bg-background pb-4 pt-2">
+        <div className="sticky bottom-0 mt-6 bg-background/95 backdrop-blur-sm pb-4 pt-3">
           <button
             onClick={handleSave}
-            disabled={selected.length < 5 || !captain}
-            className="gradient-primary w-full rounded-xl py-3.5 text-sm font-bold text-primary-foreground shadow-glow transition-transform hover:scale-[1.01] active:scale-[0.99] disabled:opacity-40 disabled:hover:scale-100"
+            disabled={selected.length < MIN_PLAYERS || !captain}
+            className="gradient-primary w-full rounded-xl py-3.5 text-sm font-bold text-primary-foreground shadow-glow transition-all hover:shadow-lg hover:scale-[1.01] active:scale-[0.99] disabled:opacity-40 disabled:hover:scale-100"
           >
-            Save Team ({selected.length} players{captain ? " • Captain selected" : ""})
+            Save Team ({selected.length} players{captain ? " • Captain ✓" : ""})
           </button>
         </div>
       </div>
