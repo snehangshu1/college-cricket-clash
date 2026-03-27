@@ -48,7 +48,7 @@ const AppHeader = () => {
 
         <div className="flex items-center gap-3">
           <Link
-            to="/admin"
+            to="/dnt"
             className="text-muted-foreground transition-colors hover:text-foreground"
             title="Admin Panel"
           >
