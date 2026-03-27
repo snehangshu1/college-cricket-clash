@@ -42,16 +42,16 @@ const LeaderboardPage = () => {
       <div className="mx-auto max-w-2xl px-4 py-8">
         <div className="mb-6 flex items-center gap-3">
           <Trophy className="h-6 w-6 text-primary" />
-          <h2 className="text-xl font-bold">Leaderboard</h2>
+          <h2 className="text-xl font-bold font-display">Leaderboard</h2>
           <span className="ml-auto rounded-full bg-primary/10 px-3 py-1 text-xs font-semibold text-primary">
             Live
           </span>
         </div>
 
         {sorted.length === 0 ? (
-          <div className="rounded-2xl border border-border bg-card p-12 text-center">
+          <div className="rounded-2xl border border-border bg-card p-12 text-center shadow-card">
             <Trophy className="mx-auto mb-3 h-12 w-12 text-muted-foreground" />
-            <h3 className="text-lg font-semibold">No teams yet</h3>
+            <h3 className="text-lg font-semibold font-display">No teams yet</h3>
             <p className="text-sm text-muted-foreground">
               Be the first to select your team!
             </p>
@@ -70,18 +70,18 @@ const LeaderboardPage = () => {
                   key={user.email}
                   className={`flex items-center gap-4 rounded-xl border p-4 transition-all ${
                     isMe
-                      ? "border-primary/30 bg-primary/5"
+                      ? "border-primary/30 bg-primary/5 shadow-card"
                       : "border-border bg-card"
                   }`}
                 >
-                  <div className="flex h-10 w-10 flex-shrink-0 items-center justify-center rounded-full bg-secondary text-sm font-bold">
+                  <div className="flex h-10 w-10 flex-shrink-0 items-center justify-center rounded-xl bg-muted text-sm font-bold">
                     {getRankIcon(index) || `#${index + 1}`}
                   </div>
                   <div className="min-w-0 flex-1">
                     <div className="flex items-center gap-2">
                       <span className="truncate font-semibold">{user.name}</span>
                       {isMe && (
-                        <span className="rounded bg-primary/20 px-1.5 py-0.5 text-[10px] font-bold text-primary">
+                        <span className="rounded-md bg-primary/10 px-1.5 py-0.5 text-[10px] font-bold text-primary">
                           YOU
                         </span>
                       )}
@@ -92,10 +92,10 @@ const LeaderboardPage = () => {
                     </div>
                   </div>
                   <div className="text-right">
-                    <div className="text-xl font-black text-primary">
+                    <div className="text-xl font-black text-primary font-display">
                       {(user.points || 0).toFixed(1)}
                     </div>
-                    <div className="text-[10px] text-muted-foreground">PTS</div>
+                    <div className="text-[10px] text-muted-foreground uppercase tracking-wide">pts</div>
                   </div>
                 </div>
               );
